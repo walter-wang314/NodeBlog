@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  div.container
+    h1= title
+    p Welcome to #{title}s
+
+block jqueryScripts
+  script $(document).ready(function() {console.log('ready');});
+
+
+
