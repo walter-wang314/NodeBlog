@@ -16,13 +16,14 @@ module.exports = function(app, config) {
   app.set('views', config.root + '/app/views');
   app.set('view engine', 'jade');
 
+  // later added
   app.use(function(request, response, next) {
     app.locals.pageName = request.path;
-    // console.log('page name: ' + app.locals.pageName);
+    console.log('express.js ---> page name: ' + app.locals.pageName);
     next();
   });
 
-  // app.use(favicon(config.root + '/public/img/favicon.ico'));
+  app.use(favicon(config.root + '/public/img/bird.ico'));
   app.use(logger('dev'));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({

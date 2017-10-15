@@ -1,6 +1,10 @@
 var path = require('path'),
-    rootPath = path.normalize(__dirname + '/..'),
-    env = process.env.NODE_ENV || 'development';
+  rootPath = path.normalize(__dirname + '/..'),
+  env = process.env.NODE_ENV || 'development';
+
+console.log('config.js ---> rootPath: ' + rootPath);
+console.log('config.js ---> env: ' + env);
+
 
 var config = {
   development: {
@@ -9,7 +13,7 @@ var config = {
       name: 'nodeblog'
     },
     port: process.env.PORT || 3000,
-    db: 'mongodb://localhost/nodeblog-development'
+    db: 'mongodb://localhost/nodeblog'
   },
 
   test: {

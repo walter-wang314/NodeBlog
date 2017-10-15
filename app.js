@@ -1,7 +1,8 @@
 var express = require('express'),
   config = require('./config/config'),
   glob = require('glob'),
-  mongoose = require('mongoose');
+  mongoose = require('mongoose'),
+  util = require('util');
 
 mongoose.connect(config.db);
 var db = mongoose.connection;
@@ -11,6 +12,7 @@ db.on('error', function () {
 
 var models = glob.sync(config.root + '/app/models/*.js');
 models.forEach(function (model) {
+  console.log('app.js ---> required modules: ' + util.inspect(model));
   require(model);
 });
 var app = express();

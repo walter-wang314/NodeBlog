@@ -1,18 +1,21 @@
 var express = require('express'),
   router = express.Router(),
   mongoose = require('mongoose'),
-  Article = mongoose.model('Article');
+  Post = mongoose.model('Post');
 
 module.exports = function (app) {
   app.use('/admin', router);
 };
 
 router.get('/', function (req, res, next) {
-  Article.find(function (err, articles) {
-    if (err) return next(err);
+  Post.find(function (err, posts) {
+    if (err) {
+      return next(err);
+    }
+
     res.render('admin/index', {
       title: 'Blog Admin',
-      articles: articles,
+      posts: posts,
       pretty: true
     });
   });
