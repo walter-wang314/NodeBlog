@@ -1,9 +1,43 @@
 extends layout
 
 block content
-  div.container
-    h1= title
-    p Welcome to #{title}s
+  each post in posts
+    div.post
+      h3.post-title
+        a(href="/posts/view" + post._id, target="_blank")
+          =post.title
+      div.post-abstract
+        =truncate(post.content, 150)
+      div.post-meta
+        span.post-created
+          发布时间:&nbsp;
+          =moment(post.created).format('YYYY-MM-DD')
+        span.post-author
+          作者:&nbsp;
+          =post.author.name
+        span.post-category
+          分类:&nbsp;
+          =post.category.name
+        span.post-comment
+          评论:&nbsp;
+          =post.comments.length || 0
+        span.post-comment
+          被赞:&nbsp;
+          =post.meta.favourite || 0
+        span.post-link
+          a(href="/posts/view/" + post._id, target="_blank")查看全文
+
+  if pageCount > 1
+    nav
+      ul.pagination
+        - var currentPage = 1
+        while currentPage < pageCount
+          if (currentPage === pageNum)
+            li.active
+              a(href="/posts?page=" + currentPage)= currentPage++
+          else
+            li.active
+              a(href="/posts?page=" + currentPage)= currentPage++
 
 block jqueryScripts
   script $(document).ready(function() {console.log('ready');});

@@ -1,24 +1,12 @@
 var express = require('express'),
-  router = express.Router(),
-  mongoose = require('mongoose'),
-  Post = mongoose.model('Post');
+  router = express.Router();
 
 module.exports = function (app) {
   app.use('/', router);
 };
 
 router.get('/', function (req, res, next) {
-  Post.find().populate('author').populate('category').exec(function (err, posts) {
-    return res.jsonp(posts);
-    if (err) {
-      return next(err);
-    }
-    res.render('blog/index', {
-      title: 'Node Blog Home',
-      posts: posts,
-      pretty: true
-    });
-  });
+  res.redirect('/posts');
 });
 
 router.get('/about', function (req, res, next) {
