@@ -1,11 +1,14 @@
 extends layout
 
 block content
-  h2.page-header Node全栈博客系统
+  h2.page-header
+    =category.name
+      span 分类下所有的文章&nbsp;
+      =posts.length
   each post in posts
     div.post
       h3.post-title
-        a(href="/posts/view/" + post.slug, target="_blank")
+        a(href="/posts/view" + post._id, target="_blank")
           =post.title
       div.post-abstract
         =truncate(post.content, 150)
@@ -24,21 +27,3 @@ block content
         span.post-link
           a(href="/posts/view/" + post._id, target="_blank")
             span 查看全文
-
-  if pageCount > 1
-    nav
-      ul.pagination
-        - var currentPage = 1
-        while currentPage < pageCount
-          if (currentPage === pageNum)
-            li.active
-              a(href="/posts?page=" + currentPage)= currentPage++
-          else
-            li
-              a(href="/posts?page=" + currentPage)= currentPage++
-
-block jqueryScripts
-  script $(document).ready(function() {console.log('ready');});
-
-
-
