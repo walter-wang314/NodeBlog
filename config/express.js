@@ -11,7 +11,7 @@ var compress = require('compression');
 var methodOverride = require('method-override');
 var mongoose = require('mongoose');
 
-var seesion = require('express-session');
+var session = require('express-session');
 var flash = require('connect-flash');
 var messages = require('express-messages');
 
