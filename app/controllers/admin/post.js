@@ -1,5 +1,6 @@
 var express = require('express'),
   router = express.Router(),
+  slug = require('slug');
   mongoose = require('mongoose'),
   Post = mongoose.model('Post'),
   User = mongoose.model('User'),
@@ -83,6 +84,52 @@ router.get('/add', function (req, res, next) {
 });
 
 router.post('/add', function (req, res, next) {
+
+  req.checkBody('title', '文章标题不能为空').notEmpty();
+  req.checkBody('category', '必须指定文章分类').notEmpty();
+  req.checkBody('content', '文章内容不能为空').notEmpty();
+
+  var errors = req.validationError();
+  if (errors) {
+    console.log(errors);
+    return res.render('admin/post/add', {
+      errors: errors,
+      title: req.body.title,
+      content: req.body.content
+    });
+  }
+
+  var title = req.body.title.trim();
+  var category = req.body.category.trim();
+  var content = req.body.content.trim();
+
+  User.findOne({}, function(err, author) {
+    if (err) {
+      return next(err);
+    }
+
+    var post = new Post({
+      title: title,
+      slug: slug(title),
+      category: category,
+      content: content,
+      author: author,
+      published: true,
+      meta: {favourite: 0},
+      comments: [],
+      created: new Date()
+    });
+
+    post.save(function (err, post) {
+      if (err) {
+        req.flash('error', '文章保存失败');
+        res.redirect('/admin/posts/add');
+      } else {
+        req.flash('info', '文章保存成功');
+        res.redirect('/admin/posts');
+      }
+    });
+  });
 });
 
 router.get('/edit/:id', function (req, res, next) {

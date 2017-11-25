@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+  // category and author filter
   var ndCategory = $('#js-category');
   var ndAuthor = $('#js-author');
 
@@ -29,4 +30,8 @@ $(document).ready(function () {
     window.location.url = window.location.origin + window.location.pathname + queryString.stringify(query);
     console.log('window.location.url: ' + window.location.url);
   });
+
+  if (typeof CKEDITOR !== 'undefined') {
+    CKEDITOR.replace('js-post-content');
+  }
 });
