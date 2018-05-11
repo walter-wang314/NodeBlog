@@ -18,103 +18,105 @@ var messages = require('express-messages');
 
 var Category = mongoose.model('Category');
 
-module.exports = function(app, config) {
-  var env = process.env.NODE_ENV || 'development';
-  app.locals.ENV = env;
-  app.locals.ENV_DEVELOPMENT = env == 'development';
+module.exports = function (app, config) {
+    var env = process.env.NODE_ENV || 'development';
+    app.locals.ENV = env;
+    app.locals.ENV_DEVELOPMENT = env == 'development';
 
-  app.set('views', config.root + '/app/views');
-  app.set('view engine', 'jade');
+    app.set('views', config.root + '/app/views');
+    app.set('view engine', 'jade');
 
-  // later added
-  app.use(function(request, response, next) {
-    app.locals.pageName = request.path;
-    app.locals.moment = moment;
-    app.locals.truncate = truncate;
-    console.log('express.js ---> page name: ' + app.locals.pageName);
-    Category.find(function(err, categories) {
-      if (err) {
-        return next(err);
-      }
-      app.locals.categories = categories;
-      next();
+    // app.locals => 应用存储变量的对象：
+    app.use(function (request, response, next) {
+        app.locals.pageName = request.path;
+        app.locals.moment = moment;
+        app.locals.truncate = truncate;
+        console.log('express.js ---> page name: ' + app.locals.pageName);
+        Category.find({}).sort('-created').exec(function (err, categories) {
+            if (err) {
+                return next(err);
+            }
+            app.locals.categories = categories;
+            next();
+        });
     });
-  });
 
-  app.use(favicon(config.root + '/public/img/bird.ico'));
-  app.use(logger('dev'));
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({
-    extended: true
-  }));
+    app.use(favicon(config.root + '/public/img/bird.ico'));
+    app.use(logger('dev'));
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({
+        extended: true
+    }));
 
-  app.use(validator({
-    errorFormatter: function(param, msg, value) {
-      var namespace = param.split('.'),
-        root = namespace.shift(),
-        formParam = root;
+    app.use(validator({
+        errorFormatter: function (param, msg, value) {
+            var namespace = param.split('.'),
+                root = namespace.shift(),
+                formParam = root;
 
-      while (namespace.length) {
-        formParam += '[' + namespace.shift() + '}';
-      }
+            while (namespace.length) {
+                formParam += '[' + namespace.shift() + '}';
+            }
 
-      return {
-        param : formParam,
-        msg : msg,
-        value : value
-      };
+            return {
+                param: formParam,
+                msg: msg,
+                value: value
+            };
+        }
+    }));
+
+
+    app.use(cookieParser());
+
+    app.use(session({
+        secret: 'nodeblog',
+        resave: false,
+        saveUninitialized: true,
+        cookie: {secure: false}
+    }));
+    app.use(flash());
+    app.use(function (req, res, next) {
+        res.locals.messages = messages(req, res);
+        next();
+    });
+
+    app.use(compress());
+    app.use(express.static(config.root + '/public'));
+    app.use(methodOverride());
+
+    var controllers = glob.sync(config.root + '/app/controllers/**/*.js');
+    controllers.forEach(function (controller) {
+        require(controller)(app);
+    });
+
+    // 404 中间件
+    app.use(function (req, res, next) {
+        var err = new Error('Not Found');
+        err.status = 404;
+        next(err);
+    });
+
+    if (app.get('env') === 'development') {
+        app.use(function (err, req, res, next) {
+            res.status(err.status || 500);
+            res.render('error', {
+                message: err.message,
+                error: err,
+                title: 'error'
+            });
+        });
     }
-  }));
 
-
-  app.use(cookieParser());
-
-  app.use(session({
-    secret: 'nodeblog',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
-  }));
-  app.use(flash());
-  app.use(function (req, res, next) {
-    res.locals.messages = messages(req, res);
-    next();
-  });
-
-  app.use(compress());
-  app.use(express.static(config.root + '/public'));
-  app.use(methodOverride());
-
-  var controllers = glob.sync(config.root + '/app/controllers/**/*.js');
-  controllers.forEach(function (controller) {
-    require(controller)(app);
-  });
-
-  app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-  });
-
-  if(app.get('env') === 'development'){
+    // 错误处理中间件
     app.use(function (err, req, res, next) {
-      res.status(err.status || 500);
-      res.render('error', {
-        message: err.message,
-        error: err,
-        title: 'error'
-      });
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: {},
+            title: 'error'
+        });
     });
-  }
 
-  app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-      res.render('error', {
-        message: err.message,
-        error: {},
-        title: 'error'
-      });
-  });
-
-  return app;
+    return app;
 };

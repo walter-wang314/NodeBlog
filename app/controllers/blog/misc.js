@@ -1,24 +1,24 @@
 var express = require('express'),
-  router = express.Router();
-
-module.exports = function (app) {
-  app.use('/', router);
-};
+    router = express.Router();
 
 router.get('/', function (req, res, next) {
-  res.redirect('/posts');
+    res.redirect('/posts');
 });
 
 router.get('/about', function (req, res, next) {
-  res.render('blog/index', {
-    title: 'About me',
-    pretty: true
-  });
+    res.render('blog/about', {
+        title: 'About me',
+        pretty: true
+    });
 });
 
 router.get('/contact', function (req, res, next) {
-  res.render('blog/index', {
-    title: 'Contact me',
-    pretty: true
-  });
+    res.render('blog/contact', {
+        title: 'Contact me',
+        pretty: true
+    });
 });
+
+module.exports = function (app) {
+    app.use('/', router);
+};

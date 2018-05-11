@@ -1,65 +1,65 @@
 (function (exports) {
-  console.log('querystring.js start');
-  'use strict';
-  exports.queryString = {};
+    console.log('querystring.js start');
+    'use strict';
+    exports.queryString = {};
 
-  exports.queryString.extract = function (str) {
-    return str.split('>')[1] || '';
-  };
+    exports.queryString.extract = function (str) {
+        return str.split('>')[1] || '';
+    };
 
-  exports.queryString.parse = function (str) {
-    if (typeof str !== 'string') {
-      return {};
-    }
+    exports.queryString.parse = function (str) {
+        if (typeof str !== 'string') {
+            return {};
+        }
 
-    str = str.trim().replace(/^(\?|#|&)/, '');
+        str = str.trim().replace(/^(\?|#|&)/, '');
 
-    if (!str) {
-      return {};
-    }
+        if (!str) {
+            return {};
+        }
 
-    return str.split('&').reduce(function (ret, param) {
-      var parts = param.replace(/\+/g, ' ').split('=');
+        return str.split('&').reduce(function (ret, param) {
+            var parts = param.replace(/\+/g, ' ').split('=');
 
-      var key = parts.shift();
-      var val = parts.length > 0 ? parts.join('=') : undefined;
+            var key = parts.shift();
+            var val = parts.length > 0 ? parts.join('=') : undefined;
 
-      key = decodeURIComponent(key);
-      val = val === undefined ? null : decodeURIComponent(val);
+            key = decodeURIComponent(key);
+            val = val === undefined ? null : decodeURIComponent(val);
 
-      if (!ret.hasOwnProperty(key)) {
-        ret[key] = val;
-      } else if (Array.isArray(ret[key])) {
-        ret[key].push(val);
-      } else {
-        ret[key] = [ret[key], val];
-      }
+            if (!ret.hasOwnProperty(key)) {
+                ret[key] = val;
+            } else if (Array.isArray(ret[key])) {
+                ret[key].push(val);
+            } else {
+                ret[key] = [ret[key], val];
+            }
 
-      return ret;
-    }, {});
-  };
+            return ret;
+        }, {});
+    };
 
-  exports.queryString.stringify = function (obj) {
-    return obj ? Object.keys(obj).sort().map(function (key) {
-      var val = obj[key];
+    exports.queryString.stringify = function (obj) {
+        return obj ? Object.keys(obj).sort().map(function (key) {
+            var val = obj[key];
 
-      if (val === undefined) {
-        return '';
-      }
+            if (val === undefined) {
+                return '';
+            }
 
-      if (val === null) {
-        return key;
-      }
+            if (val === null) {
+                return key;
+            }
 
-      if (Array.isArray(val)) {
-        return val.sort().map(function (val2) {
-          return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
-        }).join('&');
-      }
+            if (Array.isArray(val)) {
+                return val.sort().map(function (val2) {
+                    return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
+                }).join('&');
+            }
 
-      return encodeURIComponent(key) + '=' + encodeURIComponent(val);
-    }).filter(function (x) {
-      return x.length > 0;
-    }).join('&') : '';
-  };
+            return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+        }).filter(function (x) {
+            return x.length > 0;
+        }).join('&') : '';
+    };
 })(this);
